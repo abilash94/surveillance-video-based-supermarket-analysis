@@ -19,6 +19,7 @@ def resolve_ip(dns_ip, dns_port, service):
 		return resolved
 
 def set_ip(dns_ip, dns_port, service, ip, port):
+	success = False
 	try:
 		# Create a TCP/IP socket
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -28,7 +29,8 @@ def set_ip(dns_ip, dns_port, service, ip, port):
 		print "Setting IP for service '" + service + "' " + ip + " " + str(port)
 		sock.connect(server_address)
 		sock.sendall("1 " + service + " " + ip + " " + str(port))
+		success = True
 		#sock.recv(100)
 	finally:
 		sock.close()
-
+		return success

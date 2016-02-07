@@ -35,6 +35,9 @@ else:
 
 #	get IP of videoStream
 videoStream = dnsclient.resolve_ip(dnsip, dnsport, service_name_server)
+if videoStream == 0:
+	print "DNS not running, or check IP and port of DNS"
+	sys.exit(1)
 videoStream_parts = videoStream.split()
 print videoStream_parts
 videoStreamIP = videoStream_parts[0]

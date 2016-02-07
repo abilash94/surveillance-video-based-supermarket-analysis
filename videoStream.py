@@ -87,7 +87,6 @@ class Server(threading.Thread):
 	sockets = []
 	addresses = []
 
-
 	def __init__(self, name, port):
 		threading.Thread.__init__( self )
 		self.name = name
@@ -103,7 +102,6 @@ class Server(threading.Thread):
 
 		# Listen for incoming connections
 		sock.listen(1)
-
 		while True:
 		    # Wait for a connection
 		    print 'waiting for a connection'
@@ -126,7 +124,7 @@ class Server(threading.Thread):
 	def close_connections(self):
 		print ('Closing Connections')
 		j = 0
-		for i in sockets:
+		for i in self.sockets:
 			print self.addresses[j]
 			j += 1
 			i.close()
@@ -155,8 +153,12 @@ def create_server(port, name):
 create_server(videoStream_port, service_name)
 
 #	register with DNS
-dnsclient.set_ip(dnsip, dnsport, service_name, socket.gethostbyname(socket.getfqdn()), videoStream_port)
-
+result = dnsclient.set_ip(dnsip, dnsport, service_name, socket.gethostbyname(socket.getfqdn()), videoStream_port)
+if result == 0:
+	print "DNS not running, or check IP and port of DNS"
+	Server_Instance.close_connections()
+	
+	sys.exit(1)
 
 #	signal handler
 def signal_handler(signal, frame):
