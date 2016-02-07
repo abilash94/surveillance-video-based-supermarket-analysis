@@ -91,7 +91,8 @@ class ClientThread(threading.Thread):
 				imageReceivedStarted = True
 				frameCount += 1
 				#time.sleep(0.01)
-				print time.time() - startTime, frameCount
+				#print time.time() - startTime, frameCount
+				print (frameCount / (time.time() - startTime))
 			except:
 				pass
 

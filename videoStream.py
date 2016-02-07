@@ -194,9 +194,9 @@ print "Streaming..."
 
 #	loop for streaming
 quit = False
+length = len(videoStream_clientsSocket)
 while True:
-
-	length = len(videoStream_clientsSocket)
+	
 	for i in range(length):
 		
 		grabbed, image = camera.read()
