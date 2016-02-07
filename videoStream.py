@@ -38,7 +38,7 @@ else:
 	videoSource = 0
 
 
-
+serverStarted = 0
 videoStream_clientsSocket = []
 
 #	server
@@ -93,33 +93,40 @@ class Server(threading.Thread):
 		self.port = port
 
 	def run(self):
-		# Create a TCP/IP socket
-		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		server_address = ('0.0.0.0', self.port)
-		print 'starting ' + self.name + ' server up on ' + socket.gethostbyname(socket.getfqdn()) + ' %s port %s' % server_address
-		sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		sock.bind(server_address)
+		global serverStarted
+		try:
+			# Create a TCP/IP socket
+			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			server_address = ('0.0.0.0', self.port)
+			print 'starting ' + self.name + ' server up on ' + socket.gethostbyname(socket.getfqdn()) + ' %s port %s' % server_address
+			sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+			sock.bind(server_address)
 
-		# Listen for incoming connections
-		sock.listen(1)
-		while True:
-		    # Wait for a connection
-		    print 'waiting for a connection'
-		    connection, client_address = sock.accept()
-		    self.sockets.append(connection)
-		    self.addresses.append(client_address)
-		    print 'connection from ', client_address
-		    try:
-		        #print >>sys.stderr, 'connection from', client_address
+			# Listen for incoming connections
+			sock.listen(1)
+			serverStarted = 1
+			while True:
+			    # Wait for a connection
+			    print 'waiting for a connection'
+			    connection, client_address = sock.accept()
+			    self.sockets.append(connection)
+			    self.addresses.append(client_address)
+			    print 'connection from ', client_address
+			    try:
+			        #print >>sys.stderr, 'connection from', client_address
 
-				new_thread = ServerThread(connection, client_address)
-				new_thread.start()
-				
-		            
-		    finally:
-		        # Clean up the connection
-		        #connection.close()
-		        pass
+					new_thread = ServerThread(connection, client_address)
+					new_thread.start()
+					
+			            
+			    finally:
+			        # Clean up the connection
+			        #connection.close()
+			        pass
+		except:
+			print "Unable to start videoStream server on given port"
+			serverStarted = -1
+			sys.exit(0)
 
 	def close_connections(self):
 		print ('Closing Connections')
@@ -151,13 +158,18 @@ def create_server(port, name):
 
 #	create server
 create_server(videoStream_port, service_name)
+while serverStarted == 0:
+	pass
+if serverStarted == -1:
+	print "Exiting"
+	sys.exit(1)
 
 #	register with DNS
 result = dnsclient.set_ip(dnsip, dnsport, service_name, socket.gethostbyname(socket.getfqdn()), videoStream_port)
 if result == 0:
 	print "DNS not running, or check IP and port of DNS"
 	Server_Instance.close_connections()
-	
+
 	sys.exit(1)
 
 #	signal handler
