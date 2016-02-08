@@ -1,13 +1,13 @@
 # surveillance-video-based-supermarket-analysis
 analyse people activity in supermarket from surveillance video (academic project)
 
-requirements:
-	python 2.7
-	numpy
-	imutils
-	opencv 3.1.0
+<b>requirements:</b>
+	<br>python 2.7
+	<br>numpy
+	<br>imutils
+	<br>opencv 3.1.0
 
-components:
+<b>components:</b>
 
 	DNS - for figuring out the IP of systems running various services
 	
@@ -17,7 +17,7 @@ components:
 	personTrackClient - client service which tracks humans in an image frame
 
 
-overall flow:
+<b>overall flow:</b>
 
 	DNS should run on a system
 		-p --port 		Port for DNS (defaulted)
