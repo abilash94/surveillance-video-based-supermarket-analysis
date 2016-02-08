@@ -20,7 +20,7 @@ service_name_server = "videoStream"
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--dnsip", required=False, help="ip of dns")
 ap.add_argument("-d", "--dnsport", required=False, help="port of dns")
-ap.add_argument("-p", "--port", required=False, help="port to run videoStream on")
+#ap.add_argument("-p", "--port", required=False, help="port to run videoStream on")
 args = vars(ap.parse_args())
 
 if args.get("dnsip"):
