@@ -194,6 +194,7 @@ signal.signal(signal.SIGINT, signal_handler)
 #	run loop
 while True:
 	if not imageReceivedStarted:
+		time.sleep(0.001)					#	to avoid high cpu usage
 		pass
 	else:
 		#cv2.imshow("img", imageReceived)

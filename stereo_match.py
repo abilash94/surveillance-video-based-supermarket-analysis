@@ -87,30 +87,3 @@ if __name__ == '__main__':
 
 
 
-
-def compute_3D_world_coordinates(int row, int col, shared_ptr<StereoParameters> stereo_params_sptr):
-
-    cv.Mat Q_32F;
-
-    stereo_params_sptr.Q_sptr.convertTo(Q_32F,CV_32F)
-    vec = []
-
-    vec.append(col)
-    vec.append(row)
-    vec.append(this->disparity_sptr->at<float>(row,col))
-
-    // Discard points with 0 disparity    
-    if(vec(2)==0) return NULL;
-    vec(3)=1;              
-    vec = Q_32F*vec;
-    vec /= vec(3);
-    // Discard points that are too far from the camera, and thus are highly
-    // unreliable
-    if(abs(vec(0))>10 || abs(vec(1))>10 || abs(vec(2))>10) return NULL;
-
-    cv.Vec3f point3f = cv.Vec3f;
-    point3f[0] = vec(0);
-    point3f[1] = vec(1);
-    point3f[2] = vec(2);
-
-    return point3f;

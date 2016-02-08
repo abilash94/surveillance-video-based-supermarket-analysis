@@ -205,8 +205,11 @@ while True:
 			quit = True
 			break
 			#sys.exit(0)
-
-		image = imutils.resize(image, width=min(400, image.shape[1]))
+		print image.shape
+		if image.shape[0] > 400:
+			image = imutils.resize(image, height=400)
+		elif image.shape[1] > 400:
+			image = imutils.resize(image, width=400)
 		
 		try:
 			#print image
