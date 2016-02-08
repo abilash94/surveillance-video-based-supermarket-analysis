@@ -34,3 +34,4 @@ analyse people activity in supermarket from surveillance video (academic project
 
 	videoStream service should be given 's' as input, which will then start to stream
 
+<b>Note:</b> <br>	defaulted means input is not needed for basic running on the same system. (ie) if all the services are run on the same system, no parameters are needed
