@@ -249,12 +249,18 @@ while True:
 				image = imutils.resize(image, width=400)
 		
 		try:
-			#print image
-			#videoStream_clientsSocket[i].recv(1)
-			encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
-			result, imgencode = cv2.imencode('.jpg', image, encode_param)
-			data = numpy.array(imgencode)
-			stringData = data.tostring()
+			if phoneAsWebcam:
+				stringData = jpg
+
+			#	ceonvert image into string format to be sent over socket
+			else:
+				#print image
+				#videoStream_clientsSocket[i].recv(1)
+				encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
+				result, imgencode = cv2.imencode('.jpg', image, encode_param)
+				data = numpy.array(imgencode)
+				stringData = data.tostring()
+
 			videoStream_clientsSocket[i].send( str(len(stringData)).ljust(16));
 			videoStream_clientsSocket[i].send( stringData );
 			#videoStream_clientsSocket[i].sendall(stringData)
