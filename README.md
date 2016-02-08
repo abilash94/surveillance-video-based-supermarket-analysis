@@ -8,6 +8,7 @@ requirements:
 	opencv 3.1.0
 
 components:
+
 	DNS - for figuring out the IP of systems running various services
 	
 	videoStream service - server which gets the video stream from a video source 
@@ -17,6 +18,7 @@ components:
 
 
 overall flow:
+
 	DNS should run on a system
 		-p --port 		Port for DNS (defaulted)
 
