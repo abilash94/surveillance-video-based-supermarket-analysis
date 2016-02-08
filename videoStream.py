@@ -8,8 +8,11 @@ import argparse
 import dnsclient
 import imutils
 import numpy
+import urllib2
 
 service_name = "videoStream"
+host = "192.168.1.4:8080"
+phoneAsWebcam = False
 
 #	arguments
 ap = argparse.ArgumentParser()
@@ -17,6 +20,7 @@ ap.add_argument("-i", "--dnsip", required=False, help="ip of dns")
 ap.add_argument("-d", "--dnsport", required=False, help="port of dns")
 ap.add_argument("-p", "--port", required=False, help="port to run videoStream on")
 ap.add_argument("-v", "--video", required=False, help="video to stream")
+ap.add_argument("-w", "--webip", required=False, help="IP of phone as webcam")
 args = vars(ap.parse_args())
 
 
@@ -36,7 +40,11 @@ if args.get("video"):
 	videoSource = args["video"]
 else:
 	videoSource = 0
+if args.get("webip"):
+	phoneAsWebcam = True
+	host = args["webip"]
 
+hoststr = 'http://' + host + '/video'
 
 serverStarted = 0
 videoStream_clientsSocket = []
@@ -189,8 +197,16 @@ while True:
 
 
 #	start streaming
-camera = cv2.VideoCapture(videoSource)
-print "Streaming..."
+if not phoneAsWebcam:
+	camera = cv2.VideoCapture(videoSource)
+	print "Streaming..."
+else:
+	try:
+		stream=urllib2.urlopen(hoststr)
+		bytes=''
+	except:
+		print "Service not running\nExiting"
+		sys.exit(1)
 
 #	loop for streaming
 quit = False
@@ -199,17 +215,38 @@ while True:
 	
 	for i in range(length):
 		
-		grabbed, image = camera.read()
+		if not phoneAsWebcam:
+			grabbed, image = camera.read()
+		else:
+			#time.sleep(1)
+			bytes+=stream.read(1024)
+			a = bytes.find('\xff\xd8')
+			b = bytes.find('\xff\xd9')
+			if a!=-1 and b!=-1:
+				jpg = bytes[a:b+2]
+				bytes= bytes[b+2:]
+				image = cv2.imdecode(numpy.fromstring(jpg, dtype=numpy.uint8),cv2.IMREAD_COLOR)
+				grabbed = True
+			else:
+				grabbed = False
+
+
+
+
+
 		#time.sleep(0.01)
-		if not grabbed:
+		if not grabbed and phoneAsWebcam:
+			continue
+		elif not grabbed and not phoneAsWebcam:
 			quit = True
 			break
 			#sys.exit(0)
-		#print image.shape
-		if image.shape[0] > 400:
-			image = imutils.resize(image, height=400)
-		elif image.shape[1] > 400:
-			image = imutils.resize(image, width=400)
+
+		if not phoneAsWebcam:
+			if image.shape[0] > 400:
+				image = imutils.resize(image, height=400)
+			elif image.shape[1] > 400:
+				image = imutils.resize(image, width=400)
 		
 		try:
 			#print image
@@ -236,4 +273,4 @@ for i in range(length):
 	videoStream_clientsSocket[i].close()
 print "Exiting"
 
-camera.release()
+#camera.release()

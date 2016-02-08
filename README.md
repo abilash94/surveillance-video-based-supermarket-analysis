@@ -27,6 +27,7 @@ analyse people activity in supermarket from surveillance video (academic project
 		-d --dnsport 	Port of the DNS (defaulted)
 		-p --port 		Port for this service to run (defaulted)
 		-v --video 		Video source (leaving this empty will take the webcam as source) (defaulted)
+		-w --webip		IP and port of phone running as webcam
 
 	personTrackClient service 
 		-i --dnsip  	IP of the DNS (defaulted)
