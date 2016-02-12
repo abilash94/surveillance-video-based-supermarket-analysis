@@ -75,23 +75,28 @@ class ClientThread(threading.Thread):
 		global startTime
 		while True:
 			try:
-				#self.client_sock.sendall("1")
-				#stringData = self.client_sock.recv(10000)
-				#data = numpy.fromstring(stringData, dtype='uint8')
-				length = recvall(self.client_sock,16)
-				#print "len", length
+				#	get frame header
+				metaInfo = recvall(self.client_sock,32)
+				metaInfo = metaInfo.split()
+				length = metaInfo[0]
+				frameID = metaInfo[1]
+
+				#	receive image
 				stringData = recvall(self.client_sock, int(length))
+
+				#	convert string data into image
 				data = numpy.fromstring(stringData, dtype='uint8')
 				decimg=cv2.imdecode(data,1)
-				#print "IMAGE .."
-				#print decimg
+			
+				#	set current image for processing after acquiring lock
 				lock.acquire()
 				imageReceived = decimg
 				lock.release()
+
+				#	set flag
 				imageReceivedStarted = True
 				frameCount += 1
-				#time.sleep(0.01)
-				#print time.time() - startTime, frameCount
+
 				print (frameCount / (time.time() - startTime))
 			except:
 				pass
@@ -128,14 +133,14 @@ def videoStreamConnect():
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
+#	track person(s) from frame
 def trackPerson():
-	#start = time.time()
+
 	global imageReceived
 	
+	#	get frame after locking
 	lock.acquire()
-
 	image = imageReceived
-	
 	lock.release()
 
 	orig = image.copy()
@@ -170,7 +175,7 @@ def trackPerson():
 	#print time.time() - start
 
 
-#	get videoStream socket
+#	get videoStream server service socket
 videoStreamSocket = videoStreamConnect()
 
 if videoStreamSocket == 0:
@@ -194,7 +199,9 @@ signal.signal(signal.SIGINT, signal_handler)
 #	run loop
 while True:
 	if not imageReceivedStarted:
-		time.sleep(0.001)					#	to avoid high cpu usage
+		
+		#	to avoid high cpu usage
+		time.sleep(0.001)
 		pass
 	else:
 		#cv2.imshow("img", imageReceived)

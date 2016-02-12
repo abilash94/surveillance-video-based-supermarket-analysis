@@ -23,7 +23,7 @@ ap.add_argument("-v", "--video", required=False, help="video to stream")
 ap.add_argument("-w", "--webip", required=False, help="IP of phone as webcam")
 args = vars(ap.parse_args())
 
-
+#	assign arguments
 if args.get("dnsip"):
 	dnsip = args["dnsip"]
 else:
@@ -44,13 +44,17 @@ if args.get("webip"):
 	phoneAsWebcam = True
 	host = args["webip"]
 
+#	IP Webcam host URL
 hoststr = 'http://' + host + '/video'
 
+#	flag for server started
 serverStarted = 0
+
+#	sockets of clients connected with the videoStream server
 videoStream_clientsSocket = []
 
-#	server
 
+#	server
 Server_Instance = 0
 class ServerThread(threading.Thread):
 	def __init__(self, client_sock, client_address):
@@ -59,13 +63,31 @@ class ServerThread(threading.Thread):
 		self.client_address = client_address
 
 	def run(self):
+		global videoStream_clients
+
+		#	receive data from socket 
 		request = self.client_sock.recv(100)
+
+		#	terminate if an empty msg is sent
 		if request == "":
 			self.close()
-			return
-		else:
-			self.client_sock.sendall(self.process_request(request))
+			self.terminate_thread()
 
+		#	add client to socketsList and reply with success msg
+		else:
+			#	send success response
+			self.client_sock.sendall(self.process_request(request))
+			#	add to socketsList
+			videoStream_clientsSocket.append(self.client_sock)
+
+		#	terminate this server thread
+		self.terminate_thread()
+
+	#	helper for terminating this server thread
+	def terminate_thread(self):
+		sys.exit(0)
+
+	#	close connection with the client
 	def close(self):
 		print 'Closing Connection ', self.client_address
 		try:
@@ -73,8 +95,8 @@ class ServerThread(threading.Thread):
 		finally:
 			pass
 
+	#	generate response
 	def process_request(self, request):
-		global videoStream_clients
 		if request == "":
 			try:
 				self.client_sock.close()
@@ -84,9 +106,7 @@ class ServerThread(threading.Thread):
 
 		print "Connected with " + request
 
-		#videoStream_clientsIP.append(request_parts[0])
-		#videoStream_clientsPort.append(int(request_parts[1]))
-		videoStream_clientsSocket.append(self.client_sock)
+		
 		return "(y)"
 
 
@@ -100,6 +120,7 @@ class Server(threading.Thread):
 		self.name = name
 		self.port = port
 
+	#	main server thread
 	def run(self):
 		global serverStarted
 		try:
@@ -136,15 +157,19 @@ class Server(threading.Thread):
 			serverStarted = -1
 			sys.exit(0)
 
+	#	close all connections to clients
 	def close_connections(self):
 		print ('Closing Connections')
 		j = 0
 		for i in self.sockets:
 			print self.addresses[j]
 			j += 1
-			i.close()
+			try:
+				i.close()
+			finally:
+				pass
 
-
+#	set main server instance
 def set_server_instance(ins):
 	global Server_Instance 
 	Server_Instance = ins
@@ -157,6 +182,7 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
+#	create main server
 def create_server(port, name):
 	instance = Server(name, port)
 	set_server_instance(instance)
@@ -211,10 +237,11 @@ else:
 #	loop for streaming
 quit = False
 length = len(videoStream_clientsSocket)
+currentFrameID = 1
 while True:
 	
 	for i in range(length):
-		
+		a = raw_input("")					########
 		if not phoneAsWebcam:
 			grabbed, image = camera.read()
 		else:
@@ -252,17 +279,15 @@ while True:
 			if phoneAsWebcam:
 				stringData = jpg
 
-			#	ceonvert image into string format to be sent over socket
+			#	convert image into string format to be sent over socket
 			else:
-				#print image
-				#videoStream_clientsSocket[i].recv(1)
 				encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),90]
 				result, imgencode = cv2.imencode('.jpg', image, encode_param)
 				data = numpy.array(imgencode)
 				stringData = data.tostring()
-
-			videoStream_clientsSocket[i].send( str(len(stringData)).ljust(16));
+			videoStream_clientsSocket[i].send( str(len(stringData)).ljust(16) + str(currentFrameID).ljust(16));
 			videoStream_clientsSocket[i].send( stringData );
+			currentFrameID += 1
 			#videoStream_clientsSocket[i].sendall(stringData)
 		except:
 			print "EXCEP"
