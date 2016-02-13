@@ -6,6 +6,7 @@ analyse people activity in supermarket from surveillance video (academic project
 	<br>numpy
 	<br>imutils
 	<br>opencv 3.1.0
+	<br>javac 1.8.0_60
 
 <b>components:</b>
 
