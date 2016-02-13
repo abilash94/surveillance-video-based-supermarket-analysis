@@ -28,10 +28,12 @@ analyse people activity in supermarket from surveillance video (academic project
 		-p --port 		Port for this service to run (defaulted)
 		-v --video 		Video source (leaving this empty will take the webcam as source) (defaulted)
 		-w --webip		IP and port of phone running as webcam
+		-b --block 		specify if the server should block till the client signals to proceed (defaulted = True)
 
 	personTrackClient service 
 		-i --dnsip  	IP of the DNS (defaulted)
 		-d --dnsport 	Port of the DNS (defaulted)
+		-b --block 		specify if the client should send signal to proceed (defaulted = True)
 
 	videoStream service should be given 's' as input, which will then start to stream
 

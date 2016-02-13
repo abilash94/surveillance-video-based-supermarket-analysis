@@ -21,7 +21,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--dnsip", required=False, help="ip of dns")
 ap.add_argument("-d", "--dnsport", required=False, help="port of dns")
 ap.add_argument("-b", "--block", required=False, help="specify if the client should give the signal to proceed")
-#ap.add_argument("-p", "--port", required=False, help="port to run videoStream on")
+
 args = vars(ap.parse_args())
 
 if args.get("dnsip"):
