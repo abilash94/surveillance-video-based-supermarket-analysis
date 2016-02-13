@@ -130,9 +130,7 @@ class dnsclient
 			clientReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			clientWriter = new PrintWriter(client.getOutputStream(),true);
 			clientWriter.println("1 " + service + " " + ip + " " + Integer.toString(port));
-			global.log("CC");
 			resolved = clientReader.readLine();
-			global.log("DD");
 		}
 		catch(Exception e)
 		{
