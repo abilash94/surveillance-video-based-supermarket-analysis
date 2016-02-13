@@ -3,7 +3,7 @@ import java.io.*;
 
 class global
 {
-	public static boolean logging_enabled = true;
+	public static boolean logging_enabled = false;
 	public static String dns_ip = "127.0.0.1";
 	public static int dns_port = 10000;	
 	public static String continuousTrackingServiceName = "continuousTracking";
@@ -46,7 +46,10 @@ class ServerThread extends Thread
 		try
 		{
 			while (true)
-				global.print(clientReader.readLine());		
+			{
+				global.print(clientReader.readLine());
+				global.print(clientReader.readLine());	
+			}
 		}
 		catch(Exception e)
 		{

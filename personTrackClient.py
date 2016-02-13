@@ -58,6 +58,7 @@ videoStreamIP = videoStream_parts[0]
 videoStreamPort = int(videoStream_parts[1])
 
 imageReceived = 0
+metaInfoReceived = 0
 imageReceivedStarted = False
 lock = threading.Lock()
 
@@ -82,6 +83,7 @@ class ClientThread(threading.Thread):
 		self.client_sock = client_sock
 		
 	def run(self):
+		global metaInfoReceived
 		global imageReceived
 		global imageReceivedStarted
 		global lock
@@ -111,6 +113,7 @@ class ClientThread(threading.Thread):
 				#	set current image for processing after acquiring lock
 				lock.acquire()
 				imageReceived = decimg
+				metaInfoReceived = metaInfo
 				lock.release()
 
 				#	set flag
@@ -173,6 +176,7 @@ def trackPerson():
 	#	get frame after locking
 	lock.acquire()
 	image = imageReceived
+	metaInfo = metaInfoReceived
 	lock.release()
 
 	orig = image.copy()
@@ -205,7 +209,7 @@ def trackPerson():
 	cv2.imshow("Before NMS", orig)
 	cv2.imshow("After NMS", image)
 	#print time.time() - start
-	return rects
+	return pick, metaInfo
 
 #	get videoStream server service socket
 videoStreamSocket = videoStreamConnect()
@@ -239,7 +243,8 @@ while True:
 		pass
 	else:
 		#cv2.imshow("img", imageReceived)
-		rects = trackPerson()
+		rects, metaInfo = trackPerson()
+		trackingDataClient.send(metaInfo[1] + '\n')
 		trackingDataClient.send(str(rects) + '\n')
 		cv2.waitKey(1)
 
