@@ -256,7 +256,11 @@ while True:
 		#cv2.imshow("img", imageReceived)
 		rects, metaInfo = trackPerson()
 		trackingDataClient.send(metaInfo[1] + '\n')
-		trackingDataClient.send(str(rects) + '\n')
+		values = ""
+		for i in rects:
+			for j in i:
+				values += str(j) + " "
+		trackingDataClient.send(values + '\n')
 		cv2.waitKey(1)
 
 		
