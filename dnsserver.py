@@ -86,7 +86,7 @@ class ServerThread(threading.Thread):
 			service_ip.append(request_parts[2])
 			service_port.append(request_parts[3])
 			print "DNS entry " + request_parts[1] + " " + request_parts[2] + " " + request_parts[3]
-			return "(y)"
+			return "(y)" + '\n'
 		return ":("
 
 class Server:

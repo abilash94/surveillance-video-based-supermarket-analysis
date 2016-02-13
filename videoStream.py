@@ -252,7 +252,6 @@ currentFrameID = 1
 while True:
 	length = len(videoStream_clientsSocket)	
 	for i in range(length):
-		a = raw_input("")					########
 		if not phoneAsWebcam:
 			grabbed, image = camera.read()
 		else:

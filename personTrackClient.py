@@ -15,6 +15,7 @@ import dnsclient
 
 service_name = "personTrackClient"
 service_name_server = "videoStream"
+service_name_tracking_dump_server = "continuousTracking"
 
 #	arguments
 ap = argparse.ArgumentParser()
@@ -43,6 +44,11 @@ systemIP = socket.gethostbyname(socket.gethostname())
 
 #	get IP of videoStream
 videoStream = dnsclient.resolve_ip(dnsip, dnsport, service_name_server)
+
+#	get IP of tracking_data_dump_client
+trackingDataClientIP = dnsclient.resolve_ip(dnsip, dnsport, service_name_tracking_dump_server)
+
+
 if videoStream == 0:
 	print "DNS not running, or check IP and port of DNS"
 	sys.exit(1)
@@ -116,6 +122,18 @@ class ClientThread(threading.Thread):
 				pass
 
 
+
+def tracking_data_dump_client():
+	global trackingDataClientIP
+	# Create a TCP/IP socket
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	# Connect the socket to the port where the server is listening
+	trackingDataClientIP = trackingDataClientIP.split()
+	server_address = (trackingDataClientIP[0], int(trackingDataClientIP[1]))
+	sock.connect(server_address)
+	return sock
+
+
 #	connect as client with the videoStream Server
 
 def videoStreamConnect():
@@ -187,7 +205,7 @@ def trackPerson():
 	cv2.imshow("Before NMS", orig)
 	cv2.imshow("After NMS", image)
 	#print time.time() - start
-
+	return rects
 
 #	get videoStream server service socket
 videoStreamSocket = videoStreamConnect()
@@ -210,6 +228,8 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
+trackingDataClient = tracking_data_dump_client()
+
 #	run loop
 while True:
 	if not imageReceivedStarted:
@@ -219,7 +239,8 @@ while True:
 		pass
 	else:
 		#cv2.imshow("img", imageReceived)
-		trackPerson()
+		rects = trackPerson()
+		trackingDataClient.send(str(rects) + '\n')
 		cv2.waitKey(1)
 
 		

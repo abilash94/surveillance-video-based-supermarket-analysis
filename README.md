@@ -16,6 +16,8 @@ analyse people activity in supermarket from surveillance video (academic project
 
 	personTrackClient - client service which tracks humans in an image frame
 
+	continuousTracking - get tracked data from client(s) and map person(s) movement(s)
+
 
 <b>overall flow:</b>
 
@@ -29,6 +31,10 @@ analyse people activity in supermarket from surveillance video (academic project
 		-v --video 		Video source (leaving this empty will take the webcam as source) (defaulted)
 		-w --webip		IP and port of phone running as webcam
 		-b --block 		specify if the server should block till the client signals to proceed (defaulted = True)
+
+	continuousTracking service must be started
+		-d 				IP of DNS (defaulted)
+		-p 				Port of DNS (defaulted)
 
 	personTrackClient service 
 		-i --dnsip  	IP of the DNS (defaulted)
