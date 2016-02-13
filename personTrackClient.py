@@ -57,6 +57,7 @@ print videoStream_parts
 videoStreamIP = videoStream_parts[0]
 videoStreamPort = int(videoStream_parts[1])
 
+imageReceivedProcessed = True
 imageReceived = 0
 metaInfoReceived = 0
 imageReceivedStarted = False
@@ -89,6 +90,7 @@ class ClientThread(threading.Thread):
 		global lock
 		global frameCount
 		global startTime
+		global imageReceivedProcessed
 		while True:
 			try:
 				#	get frame header
@@ -96,6 +98,11 @@ class ClientThread(threading.Thread):
 				
 				#	if signal to proceed needs to be given
 				if block_by_client:
+					#	wait till last image is processed
+					while not imageReceivedProcessed:
+						#	avoid high cpu usage
+						time.sleep(0.0001)
+						pass
 					#	reply with proceed
 					self.client_sock.sendall("1")
 
@@ -114,6 +121,7 @@ class ClientThread(threading.Thread):
 				lock.acquire()
 				imageReceived = decimg
 				metaInfoReceived = metaInfo
+				imageReceivedProcessed = False
 				lock.release()
 
 				#	set flag
@@ -170,13 +178,16 @@ hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 #	track person(s) from frame
 def trackPerson():
-
-	global imageReceived
 	
+	global imageReceived
+	global metaInfoReceived
+	global imageReceivedProcessed
+
 	#	get frame after locking
 	lock.acquire()
 	image = imageReceived
 	metaInfo = metaInfoReceived
+	imageReceivedProcessed = True
 	lock.release()
 
 	orig = image.copy()

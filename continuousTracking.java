@@ -180,9 +180,16 @@ public class continuousTracking
 		{
 			global.log("DNS entry not created.");
 			return ;
-		}	
-		Server server = new Server(global.continuousTrackingServicePort);
-		server.start();
-		while(true);	
+		}
+		try
+		{	
+			Server server = new Server(global.continuousTrackingServicePort);
+			server.start();
+			server.join();
+		}
+		catch(Exception e)
+		{
+			global.log("parent ain't waiting ");
+		}
 	}
 }
