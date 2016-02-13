@@ -169,9 +169,7 @@ public class continuousTracking
 		try
 		{
 			InetAddress IP = InetAddress.getLocalHost();
-			global.log("AA");
 			String res = dnsclient.set_ip(global.dns_ip, global.dns_port, global.continuousTrackingServiceName, IP.getHostAddress().toString(), global.continuousTrackingServicePort);
-			global.log("BB");
 			global.log(res);
 			global.log("DNS entry created");
 		}
