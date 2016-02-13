@@ -2,6 +2,7 @@
 analyse people activity in supermarket from surveillance video (academic project)
 
 <b>requirements:</b>
+
 	<br>python 2.7
 	<br>numpy
 	<br>imutils
