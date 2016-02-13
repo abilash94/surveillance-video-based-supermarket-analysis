@@ -20,6 +20,7 @@ service_name_server = "videoStream"
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--dnsip", required=False, help="ip of dns")
 ap.add_argument("-d", "--dnsport", required=False, help="port of dns")
+ap.add_argument("-b", "--block", required=False, help="specify if the client should give the signal to proceed")
 #ap.add_argument("-p", "--port", required=False, help="port to run videoStream on")
 args = vars(ap.parse_args())
 
@@ -31,7 +32,14 @@ if args.get("dnsport"):
 	dnsport = int(args["dnsport"])
 else:
 	dnsport = 10000
+if args.get("block"):
+	block_by_client = args["block"]
+else:
+	block_by_client = True
 
+
+#	get system IP
+systemIP = socket.gethostbyname(socket.gethostname())
 
 #	get IP of videoStream
 videoStream = dnsclient.resolve_ip(dnsip, dnsport, service_name_server)
@@ -77,6 +85,12 @@ class ClientThread(threading.Thread):
 			try:
 				#	get frame header
 				metaInfo = recvall(self.client_sock,32)
+				
+				#	if signal to proceed needs to be given
+				if block_by_client:
+					#	reply with proceed
+					self.client_sock.sendall("1")
+
 				metaInfo = metaInfo.split()
 				length = metaInfo[0]
 				frameID = metaInfo[1]
@@ -115,7 +129,7 @@ def videoStreamConnect():
 		server_address = (videoStreamIP, videoStreamPort)
 		sock.connect(server_address)
 		print "Connected with videoStream\n"
-		sock.sendall(socket.gethostbyname(socket.getfqdn()))
+		sock.sendall(systemIP)
 		response = sock.recv(100)
 		if response == '(y)':
 			return sock 
@@ -199,7 +213,7 @@ signal.signal(signal.SIGINT, signal_handler)
 #	run loop
 while True:
 	if not imageReceivedStarted:
-		
+
 		#	to avoid high cpu usage
 		time.sleep(0.001)
 		pass

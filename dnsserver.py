@@ -41,6 +41,9 @@ service_name = []
 service_ip = []
 service_port = []
 
+#	get system IP
+systemIP = socket.gethostbyname(socket.gethostname())
+
 
 Server_Instance = 0
 class ServerThread(threading.Thread):
@@ -97,7 +100,8 @@ class Server:
 		# Create a TCP/IP socket
 		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server_address = ('0.0.0.0', port)
-		print 'starting ' + name + ' server up on ' + socket.gethostbyname(socket.getfqdn()) + ' %s port %s' % server_address
+
+		print 'starting ' + name + ' server up on ' + systemIP + ' %s port %s' % server_address
 		sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		sock.bind(server_address)
 

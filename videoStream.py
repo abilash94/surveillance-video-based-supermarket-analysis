@@ -21,6 +21,7 @@ ap.add_argument("-d", "--dnsport", required=False, help="port of dns")
 ap.add_argument("-p", "--port", required=False, help="port to run videoStream on")
 ap.add_argument("-v", "--video", required=False, help="video to stream")
 ap.add_argument("-w", "--webip", required=False, help="IP of phone as webcam")
+ap.add_argument("-b", "--block", required=False, help="specify if the server should block till the client signals to proceed")
 args = vars(ap.parse_args())
 
 #	assign arguments
@@ -43,6 +44,11 @@ else:
 if args.get("webip"):
 	phoneAsWebcam = True
 	host = args["webip"]
+if args.get("block"):
+	block_by_client = args["block"]
+else:
+	block_by_client = True
+
 
 #	IP Webcam host URL
 hoststr = 'http://' + host + '/video'
@@ -52,6 +58,10 @@ serverStarted = 0
 
 #	sockets of clients connected with the videoStream server
 videoStream_clientsSocket = []
+
+
+#	get system IP
+systemIP = socket.gethostbyname(socket.gethostname())
 
 
 #	server
@@ -127,7 +137,8 @@ class Server(threading.Thread):
 			# Create a TCP/IP socket
 			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			server_address = ('0.0.0.0', self.port)
-			print 'starting ' + self.name + ' server up on ' + socket.gethostbyname(socket.getfqdn()) + ' %s port %s' % server_address
+
+			print 'starting ' + self.name + ' server up on ' + systemIP + ' %s port %s' % server_address
 			sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 			sock.bind(server_address)
 
@@ -199,7 +210,7 @@ if serverStarted == -1:
 	sys.exit(1)
 
 #	register with DNS
-result = dnsclient.set_ip(dnsip, dnsport, service_name, socket.gethostbyname(socket.getfqdn()), videoStream_port)
+result = dnsclient.set_ip(dnsip, dnsport, service_name, systemIP, videoStream_port)
 if result == 0:
 	print "DNS not running, or check IP and port of DNS"
 	Server_Instance.close_connections()
@@ -236,10 +247,10 @@ else:
 
 #	loop for streaming
 quit = False
-length = len(videoStream_clientsSocket)
+
 currentFrameID = 1
 while True:
-	
+	length = len(videoStream_clientsSocket)	
 	for i in range(length):
 		a = raw_input("")					########
 		if not phoneAsWebcam:
@@ -286,10 +297,27 @@ while True:
 				data = numpy.array(imgencode)
 				stringData = data.tostring()
 			videoStream_clientsSocket[i].send( str(len(stringData)).ljust(16) + str(currentFrameID).ljust(16));
-			videoStream_clientsSocket[i].send( stringData );
-			currentFrameID += 1
+			
+			#	if the server is to blocked by client, block
+			if block_by_client:
+				resp = videoStream_clientsSocket[i].recv(1)
+			else:
+				resp = "1"
+
+			#	if the client 
+			if resp == "1":
+				videoStream_clientsSocket[i].send( stringData );
+				currentFrameID += 1
+			else:
+				videoStream_clientsSocket[i].close()
+				#	remove client socket from sockets list
+				del videoStream_clientsSocket[i]
+
+				#	this frame will be skipped if the destination is not willing to accept
+
 			#videoStream_clientsSocket[i].sendall(stringData)
-		except:
+		except Exception, err:
+			print Exception, err
 			print "EXCEP"
 
 	if quit:
