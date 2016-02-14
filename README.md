@@ -37,6 +37,7 @@ analyse people activity in supermarket from surveillance video (academic project
 	continuousTracking service must be started
 		-d 				IP of DNS (defaulted)
 		-p 				Port of DNS (defaulted)
+		example: "java continuousTracking -d 127.0.0.1 -p 10000"	(follow this exact format, for now :P)
 
 	personTrackClient service 
 		-i --dnsip  	IP of the DNS (defaulted)
