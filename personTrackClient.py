@@ -262,6 +262,7 @@ while True:
 		
 		#	if no frame was captured
 		if metaInfo is None:
+			time.sleep(0.0001)
 			continue
 		trackingDataClient.send(metaInfo[1] + '\n')
 		values = ""
