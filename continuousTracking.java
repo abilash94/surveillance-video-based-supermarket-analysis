@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+
 //	structure for rectangle co-ordinates
 class rect
 {
@@ -59,6 +60,8 @@ class global
 	 	int[] values = new int[valuesS.length];
 	 	for (int i = 0; i < valuesS.length; ++i)
 	 	{
+	 		if (valuesS[i].equals(""))
+	 			continue;
 	 		values[i] = Integer.parseInt(valuesS[i]);
 	 		++valuesCount;
 	 	}
@@ -152,7 +155,7 @@ class ServerThread extends Thread
 				//	read frame data
 				rects r = global.parseFrameString(clientReader.readLine());
 				
-				dm.appendRects(frameID, r);
+				global.log("size writebank " + dm.currentBankWriting + " : " + Integer.toString(dm.appendRects(frameID, r)));
 				//global.print(clientReader.readLine());	
 			}
 		}
@@ -296,12 +299,14 @@ class dataManager
 	public boolean dataReadCompleted = false;
 
 	//	insert rectangle data into data bank
-	public void appendRects(int frameID, rects r)
+	public int appendRects(int frameID, rects r)
 	{
 		if (currentBankWriting == 1)
 			dataBank_1.put(frameID, r);
+
 		else
 			dataBank_2.put(frameID, r);
+		return sizeWritingBank();
 	}
 
 	public int sizeWritingBank()
@@ -439,8 +444,27 @@ public class continuousTracking
 			//	retrieve frames
 			Map < Integer, rects > retrivedFrames = dm.getFrames();
 
-			//	process frames
-
+			//	log number of frames received
+			int framesCount = retrivedFrames.size();
+			if (framesCount != 0)
+			{
+				global.log("got frames bank " + dm.currentBankWriting + " : " + Integer.toString(framesCount));
+			
+				//	process frames
+				for (Map.Entry<Integer, rects> entry : retrivedFrames.entrySet())
+				{
+				    global.log(entry.getKey() + "/" + entry.getValue().rectangles.length);
+				}
+			}	
+			else
+			{
+				//	to avoid high cpu usage		
+				try
+				{
+					Thread.sleep(global.dataBankSwitchInterval);
+				}
+				catch(Exception e){}
+			}
 		}
 	}
 }
