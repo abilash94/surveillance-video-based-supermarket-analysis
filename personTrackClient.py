@@ -182,6 +182,10 @@ def trackPerson():
 	global imageReceived
 	global metaInfoReceived
 	global imageReceivedProcessed
+	
+	#	check for no frame
+	if imageReceived is None:
+		return None, None
 
 	#	get frame after locking
 	lock.acquire()
@@ -255,6 +259,10 @@ while True:
 	else:
 		#cv2.imshow("img", imageReceived)
 		rects, metaInfo = trackPerson()
+		
+		#	if no frame was captured
+		if metaInfo is None:
+			continue
 		trackingDataClient.send(metaInfo[1] + '\n')
 		values = ""
 		for i in rects:

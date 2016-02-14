@@ -149,8 +149,15 @@ class ServerThread extends Thread
 		{
 			while (true)
 			{
+				//	be safe for null values
+				String metainfo = clientReader.readLine();
+				if (metainfo.equals(null))
+				{
+					Thread.sleep(1);
+					continue;
+				}
 				//	read metainfo (frameID)
-				int frameID = Integer.parseInt(clientReader.readLine());
+				int frameID = Integer.parseInt(metainfo);
 
 				//	read frame data
 				rects r = global.parseFrameString(clientReader.readLine());
