@@ -5,3 +5,5 @@
 *.pyc
 *.class
 *.txt
+.DS_Store
+.vscode/
