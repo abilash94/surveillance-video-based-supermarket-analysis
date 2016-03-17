@@ -9,11 +9,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.PriorityQueue;
 import java.io.File;
 
 class rect
 {
 	public int xlt, ylt, xrt, yrt, xlb, ylb, xrb, yrb;
+	public rect()
+	{
+		//dummy
+	}
+	public rect(rect a)
+	{
+		xlt=a.xlt;
+		ylt=a.ylt;
+		xrt=a.xrt;
+		yrt=a.yrt;
+		xlb=a.xlb;
+		ylb=a.ylb;
+		xrb=a.xrb;
+		yrb=a.yrb;
+	}
 }
 
 class rects
@@ -29,8 +46,14 @@ class userCart
 	public userCart(rect a)
 	{
 		miss=0;
-		curr=a;
+		curr=new rect(a);
 		productList=new Vector();
+	}
+	public userCart(userCart a)
+	{
+		miss=a.miss;
+		curr=new rect(a.curr);
+		productList=(Vector)a.productList.clone();
 	}
 }
 class maputilclass
@@ -41,10 +64,10 @@ class maputilclass
 }
 class person
 {
-	Vector persons;
-	public person
+	Vector <userCart> persons;
+	public person()
 	{
-		persons=new Vector();
+		persons=new Vector<userCart>();
 	}
 	void add(userCart u)
 	{	
@@ -54,7 +77,7 @@ class person
 	{
 		for(int i=0;i<persons.size();i++)
 		{
-			if(persons[i].miss>60)
+			if(persons.elementAt(i).miss>60)
 			{
 				persons.removeElementAt(i);
 				i--;
@@ -81,13 +104,13 @@ class person
 	{
 		Queue <maputilclass> mappingUtil= new PriorityQueue<maputilclass>(1,idComparator);
 		boolean [] personsCheck =new boolean [ persons.size()];
-		boolean [] rectsCheck = new boolean [rects.rectCount];
+		boolean [] rectsCheck = new boolean [a.rectCount];
 		int i,j;
 		for(i=0;i<persons.size();i++)
-			for(j=0;j<rects.rectCount;j++)
+			for(j=0;j<a.rectCount;j++)
 			{
 				maputilclass temp=new maputilclass();
-				temp.distance=rectDistance(persons.elementAt(i).curr,rects.rect[i]);
+				temp.distance=rectDistance(persons.elementAt(i).curr,a.rectangles[i]);
 				temp.i=i;
 				temp.j=j;
 			}
@@ -96,11 +119,24 @@ class person
 			maputilclass temp=mappingUtil.poll();
 			if(personsCheck[temp.i]==false&&rectsCheck[temp.j]==false)
 			{
-				userCart temp = persons.elementAt(i);
-				temp.rect
-				persons.set(i,)
+				personsCheck[temp.i]=true;
+				rectsCheck[temp.j]=true;
+				persons.elementAt(temp.i).curr=new rect(a.rectangles[temp.j]);
+				persons.elementAt(temp.i).miss=0;
 			} 
 		}
+		for(i=0;i<persons.size();i++)
+			if(personsCheck[i]==false)
+			{
+				persons.elementAt(i).miss++;
+			}
+		for(i=0;i<a.rectCount;i++)
+			if(rectsCheck[i]==false)
+			{
+				persons.addElement(new userCart(a.rectangles[i]));
+			}
+		this.check();
+		System.out.println("Persons : "+persons.size());
 	}
 }
 
