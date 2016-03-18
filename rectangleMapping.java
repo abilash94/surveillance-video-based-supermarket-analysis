@@ -65,24 +65,11 @@ class maputilclass
 class person
 {
 	Vector <userCart> persons;
+	int size;
 	public person()
 	{
+		size=0;
 		persons=new Vector<userCart>();
-	}
-	void add(userCart u)
-	{	
-		persons.addElement(u);
-	}
-	void check()
-	{
-		for(int i=0;i<persons.size();i++)
-		{
-			if(persons.elementAt(i).miss>60)
-			{
-				persons.removeElementAt(i);
-				i--;
-			}
-		}
 	}
 	public int rectDistance(rect a,rect b)   //Distance between midpoints of two rectangles
 	{
@@ -106,13 +93,14 @@ class person
 		boolean [] personsCheck =new boolean [ persons.size()];
 		boolean [] rectsCheck = new boolean [a.rectCount];
 		int i,j;
-		for(i=0;i<persons.size();i++)
+		for(i=0;i<this.size;i++)
 			for(j=0;j<a.rectCount;j++)
 			{
 				maputilclass temp=new maputilclass();
 				temp.distance=rectDistance(persons.elementAt(i).curr,a.rectangles[i]);
 				temp.i=i;
 				temp.j=j;
+				mappingUtil.add(temp);
 			}
 		while(mappingUtil.size()>0)
 		{
@@ -125,17 +113,23 @@ class person
 				persons.elementAt(temp.i).miss=0;
 			} 
 		}
-		for(i=0;i<persons.size();i++)
+		for(i=0;i<this.size;i++)
 			if(personsCheck[i]==false)
 			{
 				persons.elementAt(i).miss++;
+				if(persons.elementAt(i).miss>60)
+				{
+					persons.removeElementAt(i);
+					i--;
+					this.size--;
+				}
 			}
 		for(i=0;i<a.rectCount;i++)
 			if(rectsCheck[i]==false)
 			{
 				persons.addElement(new userCart(a.rectangles[i]));
+				this.size++;
 			}
-		this.check();
 		System.out.println("Persons : "+persons.size());
 	}
 }
@@ -209,7 +203,8 @@ public class rectangleMapping
 
 	public static void main(String[] args) throws Exception
 	{
-		Map < Integer, rects > retrivedFrames = new LinkedHashMap<Integer, rects>();;
+		Map < Integer, rects > retrivedFrames = new LinkedHashMap<Integer, rects>();
+		person p = new person();
 
 		BufferedReader br = new BufferedReader(new FileReader("dump.txt"));
 		String everything = "";
@@ -240,8 +235,7 @@ public class rectangleMapping
 
 		for (Map.Entry<Integer, rects> entry : retrivedFrames.entrySet())
 				{
-					System.out.println(entry.getKey());
-					System.out.println(entry.getValue().rectCount);
+					p.map(entry.getValue());
 				}
 	}
 }
