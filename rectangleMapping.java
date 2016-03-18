@@ -93,15 +93,19 @@ class person
 		boolean [] personsCheck =new boolean [ persons.size()];
 		boolean [] rectsCheck = new boolean [a.rectCount];
 		int i,j;
+		//System.out.println("Vector size : "+ this.size);
 		for(i=0;i<this.size;i++)
+		{
 			for(j=0;j<a.rectCount;j++)
 			{
+				//System.out.println(i);
 				maputilclass temp=new maputilclass();
-				temp.distance=rectDistance(persons.elementAt(i).curr,a.rectangles[i]);
+				temp.distance=rectDistance(this.persons.elementAt(i).curr,a.rectangles[j]);
 				temp.i=i;
 				temp.j=j;
 				mappingUtil.add(temp);
 			}
+		}
 		while(mappingUtil.size()>0)
 		{
 			maputilclass temp=mappingUtil.poll();
@@ -109,17 +113,18 @@ class person
 			{
 				personsCheck[temp.i]=true;
 				rectsCheck[temp.j]=true;
-				persons.elementAt(temp.i).curr=new rect(a.rectangles[temp.j]);
-				persons.elementAt(temp.i).miss=0;
+				this.persons.elementAt(temp.i).curr=new rect(a.rectangles[temp.j]);
+				this.persons.elementAt(temp.i).miss=0;
 			} 
 		}
 		for(i=0;i<this.size;i++)
 			if(personsCheck[i]==false)
 			{
-				persons.elementAt(i).miss++;
-				if(persons.elementAt(i).miss>60)
+				this.persons.elementAt(i).miss++;
+				if(this.persons.elementAt(i).miss>60)
 				{
 					persons.removeElementAt(i);
+					//System.out.println("Person removed");
 					i--;
 					this.size--;
 				}
@@ -127,10 +132,11 @@ class person
 		for(i=0;i<a.rectCount;i++)
 			if(rectsCheck[i]==false)
 			{
-				persons.addElement(new userCart(a.rectangles[i]));
+				//System.out.println("New person added");
+				this.persons.addElement(new userCart(a.rectangles[i]));
 				this.size++;
 			}
-		System.out.println("Persons : "+persons.size());
+		System.out.println("Persons : "+this.persons.size());
 	}
 }
 
