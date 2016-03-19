@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.PriorityQueue;
 import java.io.File;
+import java.util.Scanner;
 
 class rect
 {
@@ -65,11 +66,54 @@ class maputilclass
 class person
 {
 	Vector <userCart> persons;
+	Vector <Integer> leftRack; 
+	Vector <Integer> rightRack;
+	Vector <Integer> leftRackHeight;
+	Vector <Integer> rightRackHeight;
+	Vector <String> leftRackProduct;
+	Vector <String> rightRackProduct;
 	int size;
 	public person()
 	{
 		size=0;
 		persons=new Vector<userCart>();
+		leftRack = new Vector<Integer>();
+		 rightRack = new Vector<Integer>();
+		 leftRackHeight = new Vector<Integer>();
+		 rightRackHeight = new Vector<Integer>();
+		 leftRackProduct = new Vector<String>();
+		 rightRackProduct = new Vector<String>();
+		try
+		{
+		BufferedReader br = new BufferedReader(new FileReader("map.txt"));
+		int i;
+		int leftCount = Integer.parseInt(br.readLine());
+		int rightCount;
+		for (i = 0; i < leftCount; ++i)
+		{
+			String ip=br.readLine();
+			String [] elements = ip.split(" ");
+			leftRack.addElement(Integer.parseInt(elements[0]));
+			leftRackHeight.addElement(Integer.parseInt(elements[1]));
+			leftRackProduct.addElement(elements[2]);
+			System.out.println(leftRack.elementAt(i)+" "+leftRackHeight.elementAt(i)+" "+leftRackProduct.elementAt(i));
+		}
+		rightCount= Integer.parseInt(br.readLine());
+		for (i = 0; i < rightCount; ++i)
+		{
+			String ip=br.readLine();
+			String [] elements = ip.split(" ");
+			rightRack.addElement(Integer.parseInt(elements[0]));
+			rightRackHeight.addElement(Integer.parseInt(elements[1]));
+			rightRackProduct.addElement(elements[2]);
+			System.out.println(rightRack.elementAt(i)+" "+rightRackHeight.elementAt(i)+" "+rightRackProduct.elementAt(i));
+		}
+
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	public int rectDistance(rect a,rect b)   //Distance between midpoints of two rectangles
 	{
@@ -87,7 +131,23 @@ class person
             return (int) (c1.distance - c2.distance);
         }
     };
-	void map(rects a)
+    public String findLeft(int rack, int row)
+    {
+    	int i;
+    	for(i=0;i<leftRack.size();i++)
+    		if(leftRack.elementAt(i)==rack&&leftRackHeight.elementAt(i)==row)
+    			return leftRackProduct.elementAt(i);
+ 		return null;
+    }
+    public String findRight(int rack, int row)
+    {
+    	int i;
+    	for(i=0;i<rightRack.size();i++)
+    		if(rightRack.elementAt(i)==rack&&rightRackHeight.elementAt(i)==row)
+	    		return rightRackProduct.elementAt(i);
+	    return null;
+    }
+	void map(rects a) throws Exception
 	{
 		Queue <maputilclass> mappingUtil= new PriorityQueue<maputilclass>(1,idComparator);
 		boolean [] personsCheck =new boolean [ persons.size()];
@@ -136,7 +196,52 @@ class person
 				this.persons.addElement(new userCart(a.rectangles[i]));
 				this.size++;
 			}
-		System.out.println("Persons : "+this.persons.size());
+		//System.out.println("Persons : "+this.persons.size());
+		//int leftRack[] = new int[100];
+		//int leftRackHeight[] = new int[100];
+		//int rightRack[] = new int[100];
+		//int rightRackHeight = new int [100];
+		
+		for (i = 0; i < a.rectCount; ++i)			
+		{
+			int lowestLevelOfFrame = 360 - a.rectangles[i].ylb - 30; // net y = 360
+			int horizontalAxis = 300 - a.rectangles[i].xlb;	//	net x = 300
+
+			int scale = 50 / lowestLevelOfFrame;
+			int distance;
+			if(scale >= 1)
+				distance = lowestLevelOfFrame * scale;
+			else
+				distance = lowestLevelOfFrame; 
+			if (distance < 300)
+			{
+				//System.out.println("Persons : "+this.persons.size());
+				//System.out.println("Distance in Metres: " + (float)distance / 100);
+				if (horizontalAxis <= 150)
+				{
+					System.out.println("Left Rack");
+					int rack = distance / 100;
+					int row;
+					int x=(a.rectangles[i].xlt+a.rectangles[i].xrb)/2;
+					int y=(a.rectangles[i].ylt+a.rectangles[i].yrb)/2;
+					row = y/90;
+					System.out.println(findLeft(rack,row));  
+				}
+				else
+				{
+					System.out.println("Right Rack");
+					int rack = distance / 100;
+					int row;
+					int x=(a.rectangles[i].xlt+a.rectangles[i].xrb)/2;
+					int y=(a.rectangles[i].ylt+a.rectangles[i].yrb)/2;
+					row = y/90;
+					System.out.println(findRight(rack,row));
+				}
+			}
+
+			//System.out.println(lowestLevelOfFrame);
+			//System.out.println((a.rectangles[i].xlb + a.rectangles[i].xrb) / 2);
+		}
 	}
 }
 
