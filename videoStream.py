@@ -250,7 +250,10 @@ quit = False
 
 currentFrameID = 1
 while True:
-	length = len(videoStream_clientsSocket)	
+	length = len(videoStream_clientsSocket)
+	#print length
+	#break
+	
 	for i in range(length):
 		if not phoneAsWebcam:
 			grabbed, image = camera.read()
@@ -321,7 +324,7 @@ while True:
 
 	if quit:
 		break
-
+		
 #60268
 
 

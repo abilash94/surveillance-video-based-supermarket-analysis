@@ -70,6 +70,7 @@ class ServerThread(threading.Thread):
 	def process_request(self, request):
 		global service_ip
 		global service_name
+		#print request###################################################
 		request_parts = request.split()
 		request_type = request_parts[0]
 		if request_type == '0':
@@ -78,7 +79,7 @@ class ServerThread(threading.Thread):
 				if i == request_parts[1]:
 					response = service_ip[j] + " " + service_port[j]
 					print "DNS response " + response
-					return response
+					return response + '\n'
 				j += 1
 			return ":("
 		else:
