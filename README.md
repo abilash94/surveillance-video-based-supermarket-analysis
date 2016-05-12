@@ -25,7 +25,20 @@ analyse people activity in supermarket from surveillance video (academic project
 
 	DNS should run on a system
 		-p --port 		Port for DNS (defaulted)
-
+	
+	ozeki service must be started and registered using ozeki_set_ip.py in backend repo
+		-i --dnsip  	IP of the DNS (defaulted)
+		-d --dnsport 	Port of the DNS (defaulted)
+	
+	rails server for maintaining billing cart must be started.
+		super-market-surveillance-backend (https://github.com/abilash94/super-market-surveillance-backend) contains a rails application
+		it must be started using DBbackend.sh (
+			DBbackend.py (params: contains port on which rails server will start, IP and port of DNS), 
+			resolveAndServe.py (function: get IP and port of ozeki service and serve to the rails server 
+			for retrieval via a HTTP request; params: IP and port of DNS), 
+			start rails server on the specified port ), 
+		which will automatically register it's IP in the DNS
+	
 	videoStream service must be started 
 		-i --dnsip  	IP of the DNS (defaulted)
 		-d --dnsport 	Port of the DNS (defaulted)
